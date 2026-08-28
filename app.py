@@ -1,510 +1,406 @@
 import streamlit as st
+import random
 
-# --------------------------------------------------
-# PAGE CONFIG
-# --------------------------------------------------
+# ------------------------------------------------
+# PAGE SETUP
+# ------------------------------------------------
 
 st.set_page_config(
-    page_title="Fire the Lesson! 🔥",
-    page_icon="🔥",
+    page_title="Crack the OBE Code",
+    page_icon="🔐",
     layout="centered"
 )
 
-# --------------------------------------------------
-# SIMPLE STYLING
-# --------------------------------------------------
+# ------------------------------------------------
+# CUSTOM CSS
+# ------------------------------------------------
 
 st.markdown("""
 <style>
 
-.main-title {
-    text-align: center;
-    font-size: 44px;
-    font-weight: 800;
-    margin-bottom: 5px;
+.title {
+    text-align:center;
+    font-size:48px;
+    font-weight:900;
+    margin-bottom:0;
 }
 
 .subtitle {
-    text-align: center;
-    font-size: 20px;
-    margin-bottom: 25px;
+    text-align:center;
+    font-size:22px;
+    font-weight:600;
+    margin-bottom:25px;
 }
 
-.case-box {
-    padding: 22px;
-    border-radius: 18px;
-    border: 2px solid #ddd;
-    margin-bottom: 20px;
+.card {
+    padding:25px;
+    border-radius:18px;
+    border:3px solid #ddd;
+    text-align:center;
+    font-size:22px;
+    font-weight:700;
+    margin-top:20px;
+    margin-bottom:25px;
+    background-color:#fafafa;
 }
 
-.big-text {
-    font-size: 22px;
-    font-weight: 700;
-}
-
-.center {
-    text-align: center;
-}
-
-.small-note {
-    text-align: center;
-    font-size: 14px;
-    opacity: 0.75;
+.station {
+    text-align:center;
+    padding:10px;
+    font-weight:700;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 
-# --------------------------------------------------
-# SESSION STATE
-# --------------------------------------------------
+# ------------------------------------------------
+# BLOOM CARDS
+# ------------------------------------------------
 
-if "case" not in st.session_state:
-    st.session_state.case = 1
+cards = [
+
+    {
+        "text": "List five characteristics of academic writing.",
+        "answer": "Remember",
+        "reason": "The learner is recalling previously learned information."
+    },
+
+    {
+        "text": "Explain constructive alignment in your own words.",
+        "answer": "Understand",
+        "reason": "The learner demonstrates understanding by explaining an idea."
+    },
+
+    {
+        "text": "Use the given rubric to assess a sample paragraph.",
+        "answer": "Apply",
+        "reason": "The learner uses knowledge or a procedure in a new task."
+    },
+
+    {
+        "text": "Compare two lesson plans and identify differences in CLO alignment.",
+        "answer": "Analyze",
+        "reason": "The learner breaks information into parts and examines relationships."
+    },
+
+    {
+        "text": "Judge which assessment method best measures the CLO and justify your answer.",
+        "answer": "Evaluate",
+        "reason": "The learner makes a judgement using criteria and evidence."
+    },
+
+    {
+        "text": "Design an OBE-aligned classroom activity for the given CLO.",
+        "answer": "Create",
+        "reason": "The learner produces something new."
+    },
+
+    {
+        "text": "Define Outcome-Based Education.",
+        "answer": "Remember",
+        "reason": "The learner retrieves a definition from memory."
+    },
+
+    {
+        "text": "Summarize the main principles of OBE.",
+        "answer": "Understand",
+        "reason": "Summarising demonstrates comprehension of information."
+    },
+
+    {
+        "text": "Demonstrate how Bloom's Taxonomy can be used to revise a CLO.",
+        "answer": "Apply",
+        "reason": "The learner applies a framework to a practical task."
+    },
+
+    {
+        "text": "Examine a lesson plan and identify where alignment breaks down.",
+        "answer": "Analyze",
+        "reason": "The learner examines relationships among different components."
+    },
+
+    {
+        "text": "Critique an AI-generated lesson plan using OBE principles.",
+        "answer": "Evaluate",
+        "reason": "Critiquing requires judgement against established criteria."
+    },
+
+    {
+        "text": "Develop an assessment task aligned with the given CLO.",
+        "answer": "Create",
+        "reason": "The learner constructs a new assessment."
+    }
+]
+
+
+# ------------------------------------------------
+# SESSION STATE
+# ------------------------------------------------
+
+if "card" not in st.session_state:
+    st.session_state.card = random.choice(cards)
+
+if "submitted" not in st.session_state:
+    st.session_state.submitted = False
 
 if "score" not in st.session_state:
     st.session_state.score = 0
 
-if "answered" not in st.session_state:
-    st.session_state.answered = False
+if "attempts" not in st.session_state:
+    st.session_state.attempts = 0
 
 
-def next_case():
-    st.session_state.case += 1
-    st.session_state.answered = False
-
-
-# --------------------------------------------------
+# ------------------------------------------------
 # HEADER
-# --------------------------------------------------
+# ------------------------------------------------
 
 st.markdown(
-    '<div class="main-title">🔥 FIRE THE LESSON!</div>',
+    '<div class="title">🔐 CRACK THE OBE CODE</div>',
     unsafe_allow_html=True
 )
 
 st.markdown(
-    '<div class="subtitle">The slightly dangerous OBE Icebreaker 😄</div>',
+    '<div class="subtitle">You have ONE card. Find where it belongs!</div>',
     unsafe_allow_html=True
 )
 
 st.info(
-    "🚨 You are now the **OBE Committee**. "
-    "Some very questionable lesson plans have arrived. "
-    "Your job is to decide whether they survive!"
+    "🎯 Read your card → Choose its Bloom's station → "
+    "Lock your answer → Be ready to defend your choice!"
 )
 
-progress = (st.session_state.case - 1) / 4
-st.progress(progress)
 
-st.caption(f"Case {min(st.session_state.case,4)} of 4")
+# ------------------------------------------------
+# CARD
+# ------------------------------------------------
+
+st.markdown("### 🃏 YOUR CARD")
+
+st.markdown(
+    f"""
+    <div class="card">
+    {st.session_state.card["text"]}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 
-# ==================================================
-# CASE 1
-# ==================================================
+# ------------------------------------------------
+# STATIONS
+# ------------------------------------------------
 
-if st.session_state.case == 1:
+st.markdown("## 🚉 Choose Your Station")
 
-    st.header("🏊 Case 1: The Swimming Professor")
+col1, col2, col3 = st.columns(3)
 
-    st.markdown("""
-### 🎯 CLO
-Students will be able to **swim 50 metres**.
-
-### 👨‍🏫 Teaching
-The teacher delivers a PowerPoint:
-
-> **10 Important Principles of Swimming**
-
-### 📚 Student Activity
-Students read:
-
-> *Chapter 3: How to Swim*
-
-### 📝 Assessment
-
-**Define swimming. [10 marks]**
-""")
-
-    st.subheader("⚖️ OBE Verdict")
-
-    choice = st.radio(
-        "What should happen to this lesson?",
-        [
-            "🟢 APPROVE IT!",
-            "🟡 MAYBE... LET'S DISCUSS",
-            "🔴 FIRE THE LESSON! 🔥"
-        ],
-        index=None,
-        key="case1"
+with col1:
+    remember = st.button(
+        "🧠 REMEMBER",
+        use_container_width=True
     )
 
-    if choice and not st.session_state.answered:
+with col2:
+    understand = st.button(
+        "💡 UNDERSTAND",
+        use_container_width=True
+    )
 
-        if choice == "🔴 FIRE THE LESSON! 🔥":
-            st.success("✅ CORRECT! The lesson has officially been fired. 🔥")
-            st.session_state.score += 1
-        else:
-            st.error("🚨 OBE Police would like a word with you.")
+with col3:
+    apply = st.button(
+        "⚙️ APPLY",
+        use_container_width=True
+    )
 
-        st.session_state.answered = True
 
-    if st.session_state.answered:
+col4, col5, col6 = st.columns(3)
 
-        st.markdown("---")
+with col4:
+    analyze = st.button(
+        "🔎 ANALYZE",
+        use_container_width=True
+    )
 
-        st.error("""
-### 🚨 OBE POLICE REPORT
+with col5:
+    evaluate = st.button(
+        "📋 EVALUATE",
+        use_container_width=True
+    )
 
-**CLO:** SWIM 🏊  
-**Teaching:** LISTEN 👂  
-**Activity:** READ 📖  
-**Assessment:** DEFINE ✍️  
+with col6:
+    create = st.button(
+        "🎨 CREATE",
+        use_container_width=True
+    )
 
-### ❌ Nobody actually swims!
-""")
 
-        st.info(
-            "💡 If students are expected to **DO** something, "
-            "teaching and assessment must give them the opportunity to **DO it**."
+# ------------------------------------------------
+# CAPTURE CHOICE
+# ------------------------------------------------
+
+choice = None
+
+if remember:
+    choice = "Remember"
+
+elif understand:
+    choice = "Understand"
+
+elif apply:
+    choice = "Apply"
+
+elif analyze:
+    choice = "Analyze"
+
+elif evaluate:
+    choice = "Evaluate"
+
+elif create:
+    choice = "Create"
+
+
+# ------------------------------------------------
+# RESULT
+# ------------------------------------------------
+
+if choice:
+
+    correct = st.session_state.card["answer"]
+
+    st.session_state.attempts += 1
+
+    if choice == correct:
+
+        st.session_state.score += 1
+
+        st.success(
+            f"🔓 CODE CRACKED! Your station is **{correct.upper()}**."
         )
 
-        if st.button("➡️ Next Case", use_container_width=True):
-            next_case()
-            st.rerun()
+        st.balloons()
 
+    else:
 
-# ==================================================
-# CASE 2
-# ==================================================
-
-elif st.session_state.case == 2:
-
-    st.header("🎂 Case 2: MasterChef University")
-
-    st.markdown("""
-### 🎯 CLO
-Students will be able to **prepare a cake**.
-
-### 👩‍🏫 Teaching
-The teacher explains:
-
-> **The History of Cake: 1850–2026**
-
-### 📺 Activity
-Students watch a cake-making video.
-
-### 📝 Assessment
-
-**List five ingredients used in cake.**
-""")
-
-    st.subheader("👨‍🍳 Your Verdict?")
-
-    choice = st.radio(
-        "Choose wisely...",
-        [
-            "🌟 MICHELIN STAR!",
-            "🟡 NEEDS MORE BAKING",
-            "🔥 GET OUT OF MY KITCHEN!"
-        ],
-        index=None,
-        key="case2"
-    )
-
-    if choice and not st.session_state.answered:
-
-        if choice == "🔥 GET OUT OF MY KITCHEN!":
-            st.success("😂 Gordon Ramsay would be proud.")
-            st.session_state.score += 1
-        else:
-            st.warning("🤔 The cake may be delicious... but the OBE isn't.")
-
-        st.session_state.answered = True
-
-    if st.session_state.answered:
-
-        st.markdown("---")
-
-        st.warning("""
-### THE PROBLEM
-
-🎯 **CLO:** PREPARE  
-
-📺 **Activity:** WATCH  
-
-📝 **Assessment:** LIST  
-
-### PREPARE ≠ LIST
-""")
-
-        st.success("""
-A better assessment would be:
-
-> **Prepare a cake following the given criteria and justify your choice of ingredients.**
-""")
-
-        if st.button("➡️ Next Case", use_container_width=True):
-            next_case()
-            st.rerun()
-
-
-# ==================================================
-# CASE 3
-# ==================================================
-
-elif st.session_state.case == 3:
-
-    st.header("🎤 Case 3: The PowerPoint Professor")
-
-    st.markdown("""
-### 🎯 CLO
-Students will be able to **create a persuasive presentation**.
-
-### 👩‍🏫 Teaching
-Teacher gives a **50-minute lecture** about presentations.
-
-### 👀 Activity
-Students watch the teacher's PowerPoint.
-
-### 📝 Assessment
-Students:
-
-> **Define persuasive presentation.**
-""")
-
-    st.subheader("⚖️ What happens now?")
-
-    choice = st.radio(
-        "OBE Committee decision:",
-        [
-            "🟢 PERFECTLY ALIGNED",
-            "🟡 OBE-ish",
-            "🔴 THIS LESSON NEEDS HELP 🚑"
-        ],
-        index=None,
-        key="case3"
-    )
-
-    if choice and not st.session_state.answered:
-
-        if choice == "🔴 THIS LESSON NEEDS HELP 🚑":
-            st.success("✅ Correct. Please call the Alignment Ambulance. 🚑")
-            st.session_state.score += 1
-        else:
-            st.error("😬 The OBE Committee has concerns.")
-
-        st.session_state.answered = True
-
-    if st.session_state.answered:
-
-        st.markdown("---")
-
-        st.error("""
-### ALIGNMENT EMERGENCY 🚨
-
-**CREATE** a presentation  
-↓  
-
-Teacher asks students to...
-
-**WATCH + DEFINE**
-
-### ❌ CREATE ≠ DEFINE
-""")
-
-        st.info("""
-A better activity might require students to:
-
-**Design → Present → Receive Feedback → Revise**
-""")
-
-        if st.button("➡️ Final Boss", use_container_width=True):
-            next_case()
-            st.rerun()
-
-
-# ==================================================
-# CASE 4
-# ==================================================
-
-elif st.session_state.case == 4:
-
-    st.header("👑 FINAL BOSS: Applied Linguistics")
-
-    st.markdown("""
-Okay. No more swimming. No more cake.
-
-Now let's make it academic. 😎
-
----
-
-### 🎯 CLO
-
-Students will be able to:
-
-**Evaluate the effectiveness of corrective feedback strategies in ESL classrooms.**
-
-### 👩‍🏫 Teaching
-
-Teacher explains different corrective feedback strategies.
-
-### 👥 Activity
-
-Students compare two classroom scenarios.
-
-### 📝 Assessment
-
-Students are asked to:
-
-> **List five types of corrective feedback.**
-""")
-
-    st.subheader("🚨 OBE Crime Detected?")
-
-    choice = st.radio(
-        "What is your verdict?",
-        [
-            "🟢 Completely aligned",
-            "🟡 Slightly suspicious",
-            "🔴 OBE CRIME DETECTED 🚨"
-        ],
-        index=None,
-        key="case4"
-    )
-
-    if choice and not st.session_state.answered:
-
-        if choice == "🔴 OBE CRIME DETECTED 🚨":
-            st.success("🚨 Correct! You caught the alignment criminal.")
-            st.session_state.score += 1
-        else:
-            st.warning("🔍 Look closely at the CLO verb.")
-
-        st.session_state.answered = True
-
-    if st.session_state.answered:
-
-        st.markdown("---")
-
-        st.error("""
-### THE CLUE WAS THE VERB 🔍
-
-CLO asks students to:
-
-# **EVALUATE**
-
-Assessment asks students to:
-
-# **LIST**
-
-### Evaluate ≠ List
-""")
-
-        st.subheader("🛠️ Can you repair it?")
-
-        repair = st.radio(
-            "Which assessment actually matches the CLO?",
-            [
-                "A. Define corrective feedback.",
-                "B. List five corrective feedback strategies.",
-                "C. Evaluate which feedback strategy is more effective in the two scenarios and justify your decision."
-            ],
-            index=None,
-            key="repair"
+        st.error(
+            f"🚨 OBE ALARM! You chose **{choice.upper()}**."
         )
 
-        if repair:
-
-            if repair.startswith("C."):
-
-                st.balloons()
-
-                st.success("""
-# 🎉 ALIGNMENT RESTORED!
-
-### EVALUATE → EVALUATE + JUSTIFY ✅
-""")
-
-                st.markdown("---")
-
-                st.markdown("## 🏆 Your OBE Committee Result")
-
-                score = st.session_state.score
-
-                if score == 4:
-                    st.success("""
-### 👑 OBE LEGEND
-
-You successfully fired every bad lesson.
-
-The OBE Committee is impressed.
-""")
-
-                elif score >= 2:
-                    st.info("""
-### 🔎 OBE DETECTIVE
-
-Your alignment instincts are working!
-""")
-
-                else:
-                    st.warning("""
-### 🛠️ ALIGNMENT APPRENTICE
-
-There is still hope. 😄
-""")
-
-                st.markdown("---")
-
-                st.markdown("""
-## 🤔 But here's the real question...
-
-You just **identified** bad alignment.
-
-You even **repaired** it.
-
-### But can we DESIGN alignment correctly from the beginning?
-
-And can **AI help us do it?**
-""")
-
-                st.success("""
-# 🚀 LET'S FIND OUT...
-
-### Welcome to the AI-Assisted OBE Lesson Planner
-""")
-
-                st.caption(
-                    "Certification valid for approximately 30 seconds. 😂"
-                )
-
-            else:
-
-                st.error("""
-🚨 Nope!
-
-Look at the CLO again:
-
-**EVALUATE**
-
-Your assessment must allow students to demonstrate **evaluation**.
-""")
+        st.warning(
+            f"Your card actually belongs at the "
+            f"**{correct.upper()}** station."
+        )
 
 
-# ==================================================
-# RESET
-# ==================================================
+    st.markdown("### 🧠 Why?")
+
+    st.info(
+        st.session_state.card["reason"]
+    )
+
+
+    # DEFEND YOUR CHOICE
+    st.markdown("---")
+
+    st.markdown("## 🎤 DEFEND YOUR CHOICE!")
+
+    st.markdown(
+        """
+        Imagine someone at another station disagrees with you.
+
+        **You have 20 seconds to justify your decision.**
+
+        Use this sentence:
+
+        > **“I placed this card at ______ because the learner has to ______.”**
+        """
+    )
+
+
+    # FUNNY MESSAGE
+    if choice == correct:
+
+        funny_messages = [
+            "😎 Bloom would approve.",
+            "🏆 The OBE Committee is impressed.",
+            "🔐 One code successfully cracked!",
+            "🎓 Academic credibility preserved.",
+            "🚨 No OBE crimes detected here."
+        ]
+
+        st.success(random.choice(funny_messages))
+
+    else:
+
+        funny_messages = [
+            "😂 Bloom's Taxonomy would like a meeting.",
+            "🚑 Please send constructive alignment immediately.",
+            "👀 The OBE Committee saw that.",
+            "😅 Your card may have boarded the wrong train.",
+            "🚨 Alignment Police have been notified."
+        ]
+
+        st.warning(random.choice(funny_messages))
+
+
+# ------------------------------------------------
+# NEW CARD
+# ------------------------------------------------
 
 st.markdown("---")
 
-if st.button("🔄 Restart Game"):
-    st.session_state.clear()
+if st.button(
+    "🎲 GIVE ME ANOTHER CARD",
+    use_container_width=True
+):
+
+    current = st.session_state.card
+
+    new_card = random.choice(cards)
+
+    while new_card == current and len(cards) > 1:
+        new_card = random.choice(cards)
+
+    st.session_state.card = new_card
     st.rerun()
 
-st.markdown(
-    '<div class="small-note">🔥 Fire the Lesson! — OBE Icebreaker</div>',
-    unsafe_allow_html=True
+
+# ------------------------------------------------
+# SCORE
+# ------------------------------------------------
+
+st.markdown("---")
+
+st.markdown("### 🏆 Your OBE Score")
+
+st.metric(
+    "Codes Cracked",
+    f"{st.session_state.score} / {st.session_state.attempts}"
+    if st.session_state.attempts
+    else "0"
+)
+
+
+# ------------------------------------------------
+# TRANSITION TO LESSON PLANNING
+# ------------------------------------------------
+
+st.markdown("---")
+
+st.markdown("""
+## 🎯 You just made an OBE decision.
+
+You matched an **observable action** with a **level of learning**.
+
+But a lesson contains much more than one action.
+
+### 🤔 So what happens when we have to align...
+
+**CLO → Teaching Activity → Assessment?**
+
+That's where lesson planning gets interesting.
+""")
+
+st.success(
+    "🚀 Next Challenge: Can AI help us build an entire OBE-aligned lesson?"
 )
