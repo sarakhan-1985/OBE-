@@ -1,406 +1,695 @@
 import streamlit as st
-import random
 
-# ------------------------------------------------
-# PAGE SETUP
-# ------------------------------------------------
+# ---------------------------------------------------------
+# PAGE CONFIG
+# ---------------------------------------------------------
 
 st.set_page_config(
-    page_title="Crack the OBE Code",
-    page_icon="🔐",
+    page_title="OBE Review Board",
+    page_icon="⚖️",
     layout="centered"
 )
 
-# ------------------------------------------------
-# CUSTOM CSS
-# ------------------------------------------------
+# ---------------------------------------------------------
+# CUSTOM STYLING
+# ---------------------------------------------------------
 
 st.markdown("""
 <style>
 
-.title {
-    text-align:center;
-    font-size:48px;
-    font-weight:900;
-    margin-bottom:0;
+.main-title {
+    text-align: center;
+    font-size: 46px;
+    font-weight: 900;
+    margin-bottom: 0px;
 }
 
 .subtitle {
-    text-align:center;
-    font-size:22px;
-    font-weight:600;
-    margin-bottom:25px;
+    text-align: center;
+    font-size: 21px;
+    font-weight: 600;
+    margin-bottom: 25px;
 }
 
-.card {
-    padding:25px;
-    border-radius:18px;
-    border:3px solid #ddd;
-    text-align:center;
-    font-size:22px;
-    font-weight:700;
-    margin-top:20px;
-    margin-bottom:25px;
-    background-color:#fafafa;
+.case-title {
+    font-size: 28px;
+    font-weight: 800;
+    margin-top: 10px;
 }
 
-.station {
-    text-align:center;
-    padding:10px;
-    font-weight:700;
+.case-box {
+    background-color: #f8f9fa;
+    padding: 22px;
+    border-radius: 16px;
+    border: 1px solid #ddd;
+    margin-bottom: 18px;
+}
+
+.audit-box {
+    padding: 20px;
+    border-radius: 15px;
+    background-color: #fff8e1;
+    border-left: 6px solid #f0ad4e;
+}
+
+.final-box {
+    padding: 24px;
+    border-radius: 18px;
+    border: 2px solid #ddd;
+    text-align: center;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
+# ---------------------------------------------------------
+# CASE DATA
+# ---------------------------------------------------------
 
-# ------------------------------------------------
-# BLOOM CARDS
-# ------------------------------------------------
-
-cards = [
+cases = [
 
     {
-        "text": "List five characteristics of academic writing.",
-        "answer": "Remember",
-        "reason": "The learner is recalling previously learned information."
+        "discipline": "🇵🇰 Pakistan Studies",
+        "title": "The Analysis That Became Recall",
+        "clo": "Analyze the political and socio-economic factors contributing to the creation of Pakistan.",
+        "teaching": """
+- Examination of political speeches  
+- Constitutional developments  
+- Historical documents  
+- Economic indicators from British India
+""",
+        "assessment": """
+**Question:** Explain five major factors that led to the creation of Pakistan.  
+**Marks:** 20
+""",
+        "rubric": """
+- Identification of factors — 8 marks  
+- Factual accuracy — 6 marks  
+- Organization — 3 marks  
+- Language — 3 marks
+""",
+        "correct": "🔴 RETURN FOR REDESIGN",
+        "issue": "Cognitive Demand / Evidence",
+        "explanation": """
+The CLO requires students to **analyze relationships among political and socio-economic factors**.
+
+However, the assessment mainly rewards:
+
+**identification + explanation + factual recall**
+
+There is little evidence that students must examine relationships, causes, interactions, or relative significance.
+""",
+        "diagnostic": "cognitive"
     },
 
     {
-        "text": "Explain constructive alignment in your own words.",
-        "answer": "Understand",
-        "reason": "The learner demonstrates understanding by explaining an idea."
+        "discipline": "🧠 Psychology",
+        "title": "A Case That Actually Works",
+        "clo": "Evaluate the effectiveness of different therapeutic approaches for managing anxiety disorders.",
+        "teaching": """
+- Examination of CBT, psychodynamic and humanistic approaches  
+- Review of relevant research findings  
+- Discussion of clinical cases
+""",
+        "assessment": """
+Students compare **CBT and psychodynamic therapy** and recommend the more appropriate intervention for a provided case, supporting their recommendation with research evidence.
+""",
+        "rubric": """
+- Comparison of approaches — 25%  
+- Evaluation of evidence — 30%  
+- Application to case — 25%  
+- Justification — 20%
+""",
+        "correct": "🟢 APPROVE",
+        "issue": "No significant alignment problem",
+        "explanation": """
+The CLO, teaching activity, assessment task, and rubric all provide evidence of **evaluation**.
+
+Students must compare alternatives, use research evidence, apply the approaches to a case, and justify their judgement.
+""",
+        "diagnostic": "evidence"
     },
 
     {
-        "text": "Use the given rubric to assess a sample paragraph.",
-        "answer": "Apply",
-        "reason": "The learner uses knowledge or a procedure in a new task."
+        "discipline": "📜 History",
+        "title": "The Verb-Matching Trap",
+        "clo": "Analyze how political, economic and social factors influenced the French Revolution.",
+        "teaching": """
+Students examine:
+
+- Primary historical documents  
+- Economic records  
+- Political writings  
+- Accounts from different social groups
+""",
+        "assessment": """
+**Analyze the political causes of the French Revolution using two provided historical documents.**
+""",
+        "rubric": """
+- Analysis — 40%  
+- Evidence — 30%  
+- Argument — 20%  
+- Academic writing — 10%
+""",
+        "correct": "🟡 APPROVE WITH REVISION",
+        "issue": "Construct Coverage",
+        "explanation": """
+The Bloom's verb appears to align:
+
+**Analyze → Analyze**
+
+But the CLO includes:
+
+**political + economic + social factors**
+
+The assessment measures **political factors only**.
+
+The verb aligns, but the **full construct is not covered**.
+""",
+        "diagnostic": "construct"
     },
 
     {
-        "text": "Compare two lesson plans and identify differences in CLO alignment.",
-        "answer": "Analyze",
-        "reason": "The learner breaks information into parts and examines relationships."
+        "discipline": "📚 English",
+        "title": "The Rubric Trap",
+        "clo": "Critically evaluate how language constructs gender identities in literary texts.",
+        "teaching": """
+Students examine:
+
+- Characterization  
+- Lexical choices  
+- Dialogue  
+- Narrative perspective  
+- Representation of gender
+""",
+        "assessment": """
+Write a **1,500-word critical analysis** examining the construction of gender identity in one selected literary text.
+""",
+        "rubric": """
+- Grammar and language — 30%  
+- Organization — 25%  
+- Referencing — 20%  
+- Presentation — 15%  
+- Critical analysis — 10%
+""",
+        "correct": "🔴 RETURN FOR REDESIGN",
+        "issue": "Rubric–CLO Misalignment",
+        "explanation": """
+The assessment **task** appears aligned.
+
+However, only **10% of the marks** actually measure critical analysis.
+
+Most marks reward language, organization, referencing and presentation.
+
+Therefore, the rubric provides weak evidence of attainment of the stated CLO.
+""",
+        "diagnostic": "rubric"
     },
 
     {
-        "text": "Judge which assessment method best measures the CLO and justify your answer.",
-        "answer": "Evaluate",
-        "reason": "The learner makes a judgement using criteria and evidence."
-    },
+        "discipline": "👥 Social Sciences",
+        "title": "The Attainment Evidence Trap",
+        "clo": "Evaluate the impact of social media on political participation among young adults.",
+        "teaching": """
+Students examine:
 
-    {
-        "text": "Design an OBE-aligned classroom activity for the given CLO.",
-        "answer": "Create",
-        "reason": "The learner produces something new."
-    },
+- Empirical studies  
+- Survey findings  
+- Competing theoretical perspectives  
+- Social-media participation data
+""",
+        "assessment": """
+Students analyze provided data and write a report evaluating whether social media increases meaningful political participation.
+""",
+        "rubric": """
+The department calculates CLO attainment using a:
 
-    {
-        "text": "Define Outcome-Based Education.",
-        "answer": "Remember",
-        "reason": "The learner retrieves a definition from memory."
-    },
+**10-mark MCQ quiz**
 
-    {
-        "text": "Summarize the main principles of OBE.",
-        "answer": "Understand",
-        "reason": "Summarising demonstrates comprehension of information."
-    },
+covering definitions of:
 
-    {
-        "text": "Demonstrate how Bloom's Taxonomy can be used to revise a CLO.",
-        "answer": "Apply",
-        "reason": "The learner applies a framework to a practical task."
-    },
+- political participation  
+- social media engagement  
+- civic participation
+""",
+        "correct": "🔴 RETURN FOR REDESIGN",
+        "issue": "Attainment Evidence",
+        "explanation": """
+The course contains an appropriate assessment task.
 
-    {
-        "text": "Examine a lesson plan and identify where alignment breaks down.",
-        "answer": "Analyze",
-        "reason": "The learner examines relationships among different components."
-    },
+However, the **instrument used to calculate CLO attainment** measures definitions and recall rather than evaluation.
 
-    {
-        "text": "Critique an AI-generated lesson plan using OBE principles.",
-        "answer": "Evaluate",
-        "reason": "Critiquing requires judgement against established criteria."
-    },
-
-    {
-        "text": "Develop an assessment task aligned with the given CLO.",
-        "answer": "Create",
-        "reason": "The learner constructs a new assessment."
+Therefore, the reported CLO attainment is not defensible from this evidence.
+""",
+        "diagnostic": "attainment"
     }
 ]
 
-
-# ------------------------------------------------
+# ---------------------------------------------------------
 # SESSION STATE
-# ------------------------------------------------
+# ---------------------------------------------------------
 
-if "card" not in st.session_state:
-    st.session_state.card = random.choice(cards)
+if "case_index" not in st.session_state:
+    st.session_state.case_index = 0
 
-if "submitted" not in st.session_state:
-    st.session_state.submitted = False
+if "answered" not in st.session_state:
+    st.session_state.answered = False
 
-if "score" not in st.session_state:
-    st.session_state.score = 0
+if "answers" not in st.session_state:
+    st.session_state.answers = []
 
-if "attempts" not in st.session_state:
-    st.session_state.attempts = 0
+if "reason_answers" not in st.session_state:
+    st.session_state.reason_answers = []
 
+if "confidence" not in st.session_state:
+    st.session_state.confidence = []
 
-# ------------------------------------------------
+# ---------------------------------------------------------
 # HEADER
-# ------------------------------------------------
+# ---------------------------------------------------------
 
 st.markdown(
-    '<div class="title">🔐 CRACK THE OBE CODE</div>',
+    '<div class="main-title">⚖️ THE OBE REVIEW BOARD</div>',
     unsafe_allow_html=True
 )
 
 st.markdown(
-    '<div class="subtitle">You have ONE card. Find where it belongs!</div>',
+    '<div class="subtitle">Would YOU approve this course?</div>',
     unsafe_allow_html=True
 )
 
-st.info(
-    "🎯 Read your card → Choose its Bloom's station → "
-    "Lock your answer → Be ready to defend your choice!"
-)
+st.info("""
+You have been appointed to an **Academic Review Board**.
 
+You will review course-design evidence from different disciplines.
 
-# ------------------------------------------------
-# CARD
-# ------------------------------------------------
+Your task is **not simply to match Bloom's verbs**.
 
-st.markdown("### 🃏 YOUR CARD")
-
-st.markdown(
-    f"""
-    <div class="card">
-    {st.session_state.card["text"]}
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-
-# ------------------------------------------------
-# STATIONS
-# ------------------------------------------------
-
-st.markdown("## 🚉 Choose Your Station")
-
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    remember = st.button(
-        "🧠 REMEMBER",
-        use_container_width=True
-    )
-
-with col2:
-    understand = st.button(
-        "💡 UNDERSTAND",
-        use_container_width=True
-    )
-
-with col3:
-    apply = st.button(
-        "⚙️ APPLY",
-        use_container_width=True
-    )
-
-
-col4, col5, col6 = st.columns(3)
-
-with col4:
-    analyze = st.button(
-        "🔎 ANALYZE",
-        use_container_width=True
-    )
-
-with col5:
-    evaluate = st.button(
-        "📋 EVALUATE",
-        use_container_width=True
-    )
-
-with col6:
-    create = st.button(
-        "🎨 CREATE",
-        use_container_width=True
-    )
-
-
-# ------------------------------------------------
-# CAPTURE CHOICE
-# ------------------------------------------------
-
-choice = None
-
-if remember:
-    choice = "Remember"
-
-elif understand:
-    choice = "Understand"
-
-elif apply:
-    choice = "Apply"
-
-elif analyze:
-    choice = "Analyze"
-
-elif evaluate:
-    choice = "Evaluate"
-
-elif create:
-    choice = "Create"
-
-
-# ------------------------------------------------
-# RESULT
-# ------------------------------------------------
-
-if choice:
-
-    correct = st.session_state.card["answer"]
-
-    st.session_state.attempts += 1
-
-    if choice == correct:
-
-        st.session_state.score += 1
-
-        st.success(
-            f"🔓 CODE CRACKED! Your station is **{correct.upper()}**."
-        )
-
-        st.balloons()
-
-    else:
-
-        st.error(
-            f"🚨 OBE ALARM! You chose **{choice.upper()}**."
-        )
-
-        st.warning(
-            f"Your card actually belongs at the "
-            f"**{correct.upper()}** station."
-        )
-
-
-    st.markdown("### 🧠 Why?")
-
-    st.info(
-        st.session_state.card["reason"]
-    )
-
-
-    # DEFEND YOUR CHOICE
-    st.markdown("---")
-
-    st.markdown("## 🎤 DEFEND YOUR CHOICE!")
-
-    st.markdown(
-        """
-        Imagine someone at another station disagrees with you.
-
-        **You have 20 seconds to justify your decision.**
-
-        Use this sentence:
-
-        > **“I placed this card at ______ because the learner has to ______.”**
-        """
-    )
-
-
-    # FUNNY MESSAGE
-    if choice == correct:
-
-        funny_messages = [
-            "😎 Bloom would approve.",
-            "🏆 The OBE Committee is impressed.",
-            "🔐 One code successfully cracked!",
-            "🎓 Academic credibility preserved.",
-            "🚨 No OBE crimes detected here."
-        ]
-
-        st.success(random.choice(funny_messages))
-
-    else:
-
-        funny_messages = [
-            "😂 Bloom's Taxonomy would like a meeting.",
-            "🚑 Please send constructive alignment immediately.",
-            "👀 The OBE Committee saw that.",
-            "😅 Your card may have boarded the wrong train.",
-            "🚨 Alignment Police have been notified."
-        ]
-
-        st.warning(random.choice(funny_messages))
-
-
-# ------------------------------------------------
-# NEW CARD
-# ------------------------------------------------
-
-st.markdown("---")
-
-if st.button(
-    "🎲 GIVE ME ANOTHER CARD",
-    use_container_width=True
-):
-
-    current = st.session_state.card
-
-    new_card = random.choice(cards)
-
-    while new_card == current and len(cards) > 1:
-        new_card = random.choice(cards)
-
-    st.session_state.card = new_card
-    st.rerun()
-
-
-# ------------------------------------------------
-# SCORE
-# ------------------------------------------------
-
-st.markdown("---")
-
-st.markdown("### 🏆 Your OBE Score")
-
-st.metric(
-    "Codes Cracked",
-    f"{st.session_state.score} / {st.session_state.attempts}"
-    if st.session_state.attempts
-    else "0"
-)
-
-
-# ------------------------------------------------
-# TRANSITION TO LESSON PLANNING
-# ------------------------------------------------
-
-st.markdown("---")
-
-st.markdown("""
-## 🎯 You just made an OBE decision.
-
-You matched an **observable action** with a **level of learning**.
-
-But a lesson contains much more than one action.
-
-### 🤔 So what happens when we have to align...
-
-**CLO → Teaching Activity → Assessment?**
-
-That's where lesson planning gets interesting.
+Your task is to decide whether the evidence genuinely demonstrates the CLO.
 """)
 
-st.success(
-    "🚀 Next Challenge: Can AI help us build an entire OBE-aligned lesson?"
-)
+# ---------------------------------------------------------
+# PROGRESS
+# ---------------------------------------------------------
+
+total_cases = len(cases)
+current_index = st.session_state.case_index
+
+if current_index < total_cases:
+
+    progress = current_index / total_cases
+    st.progress(progress)
+
+    st.caption(f"Course File {current_index + 1} of {total_cases}")
+
+    case = cases[current_index]
+
+    # -----------------------------------------------------
+    # CASE DISPLAY
+    # -----------------------------------------------------
+
+    st.markdown(
+        f'<div class="case-title">{case["discipline"]}</div>',
+        unsafe_allow_html=True
+    )
+
+    st.subheader(case["title"])
+
+    st.markdown("### 🎯 Course Learning Outcome")
+
+    st.info(case["clo"])
+
+    st.markdown("### 👩‍🏫 Teaching & Learning Evidence")
+
+    st.markdown(case["teaching"])
+
+    st.markdown("### 📝 Assessment Evidence")
+
+    st.markdown(case["assessment"])
+
+    with st.expander("📋 View Rubric / Attainment Evidence"):
+        st.markdown(case["rubric"])
+
+    st.markdown("---")
+
+    # -----------------------------------------------------
+    # BOARD DECISION
+    # -----------------------------------------------------
+
+    st.markdown("## ⚖️ Your Board Decision")
+
+    decision = st.radio(
+        "Would you approve this alignment?",
+        [
+            "🟢 APPROVE",
+            "🟡 APPROVE WITH REVISION",
+            "🔴 RETURN FOR REDESIGN"
+        ],
+        index=None,
+        key=f"decision_{current_index}"
+    )
+
+    # -----------------------------------------------------
+    # REASON
+    # -----------------------------------------------------
+
+    st.markdown("### 🔍 What most influenced your decision?")
+
+    reason = st.radio(
+        "Choose the strongest issue:",
+        [
+            "Cognitive level",
+            "Construct coverage",
+            "Teaching–CLO alignment",
+            "Assessment–CLO alignment",
+            "Rubric–CLO alignment",
+            "Attainment evidence",
+            "No significant alignment problem"
+        ],
+        index=None,
+        key=f"reason_{current_index}"
+    )
+
+    # -----------------------------------------------------
+    # CONFIDENCE
+    # -----------------------------------------------------
+
+    confidence = st.slider(
+        "How confident are you in your decision?",
+        min_value=1,
+        max_value=5,
+        value=3,
+        help="1 = Not confident | 5 = Very confident"
+    )
+
+    # -----------------------------------------------------
+    # SUBMIT
+    # -----------------------------------------------------
+
+    if not st.session_state.answered:
+
+        if st.button(
+            "🔒 LOCK BOARD DECISION",
+            use_container_width=True
+        ):
+
+            if decision is None or reason is None:
+                st.warning("Please make both a board decision and select your main reason.")
+
+            else:
+
+                st.session_state.answers.append(decision)
+                st.session_state.reason_answers.append(reason)
+                st.session_state.confidence.append(confidence)
+
+                st.session_state.answered = True
+                st.rerun()
+
+    # -----------------------------------------------------
+    # REVEAL
+    # -----------------------------------------------------
+
+    if st.session_state.answered:
+
+        user_decision = st.session_state.answers[-1]
+
+        st.markdown("---")
+
+        st.markdown("## 📋 QEC AUDIT FINDING")
+
+        if user_decision == case["correct"]:
+            st.success("✅ Your Board decision is defensible.")
+
+        else:
+            st.warning("⚠️ Your decision differs from the reference review.")
+
+        st.markdown(
+            f"""
+### Recommended Decision
+
+**{case["correct"]}**
+
+### Primary Issue
+
+**{case["issue"]}**
+"""
+        )
+
+        st.markdown(
+            f"""
+<div class="audit-box">
+{case["explanation"]}
+</div>
+""",
+            unsafe_allow_html=True
+        )
+
+        # -------------------------------------------------
+        # KEY TAKEAWAY
+        # -------------------------------------------------
+
+        if case["diagnostic"] == "cognitive":
+
+            st.info("""
+### Key Principle
+
+**Topic relevance does not guarantee cognitive alignment.**
+
+Ask:
+
+> What must students actually DO to demonstrate the CLO?
+""")
+
+        elif case["diagnostic"] == "construct":
+
+            st.info("""
+### Key Principle
+
+**Verb alignment ≠ construct alignment.**
+
+A matching Bloom's verb may still assess only part of the outcome.
+""")
+
+        elif case["diagnostic"] == "rubric":
+
+            st.info("""
+### Key Principle
+
+**An aligned assessment task can still have a misaligned rubric.**
+
+Ask:
+
+> What actually receives marks?
+""")
+
+        elif case["diagnostic"] == "attainment":
+
+            st.info("""
+### Key Principle
+
+**Course assessment and CLO-attainment evidence are not automatically the same thing.**
+
+Ask:
+
+> Which evidence is actually being used to claim attainment?
+""")
+
+        elif case["diagnostic"] == "evidence":
+
+            st.info("""
+### Key Principle
+
+Good OBE alignment means that the:
+
+**CLO → Learning Experience → Assessment → Rubric → Evidence**
+
+tell the same story.
+""")
+
+        # -------------------------------------------------
+        # NEXT CASE
+        # -------------------------------------------------
+
+        if st.button(
+            "➡️ OPEN NEXT COURSE FILE",
+            use_container_width=True
+        ):
+            st.session_state.case_index += 1
+            st.session_state.answered = False
+            st.rerun()
+
+# =========================================================
+# FINAL RESULTS
+# =========================================================
+
+else:
+
+    st.progress(1.0)
+
+    st.markdown("# 🏆 BOARD REVIEW COMPLETE")
+
+    correct_count = 0
+
+    for i, answer in enumerate(st.session_state.answers):
+        if answer == cases[i]["correct"]:
+            correct_count += 1
+
+    percentage = round(
+        correct_count / len(cases) * 100
+    )
+
+    st.metric(
+        "Defensible Board Decisions",
+        f"{correct_count} / {len(cases)}"
+    )
+
+    st.metric(
+        "Review Accuracy",
+        f"{percentage}%"
+    )
+
+    # -----------------------------------------------------
+    # DIAGNOSTIC PROFILE
+    # -----------------------------------------------------
+
+    selected_reasons = st.session_state.reason_answers
+
+    rubric_count = selected_reasons.count("Rubric–CLO alignment")
+    construct_count = selected_reasons.count("Construct coverage")
+    attainment_count = selected_reasons.count("Attainment evidence")
+    cognitive_count = selected_reasons.count("Cognitive level")
+
+    st.markdown("---")
+
+    st.markdown("## 🔎 Your OBE Reviewer Profile")
+
+    if correct_count == 5:
+
+        st.success("""
+### 🏆 THE OBE AUDITOR
+
+You consistently looked beyond surface-level verb matching and examined whether the assessment evidence genuinely demonstrated the CLO.
+""")
+
+    elif rubric_count >= 2:
+
+        st.info("""
+### 📋 THE RUBRIC AUDITOR
+
+You pay close attention to what actually receives marks.
+
+Your instinct is:
+
+**“Does the rubric measure what the CLO claims?”**
+""")
+
+    elif construct_count >= 2:
+
+        st.info("""
+### 🎯 THE CONSTRUCT CHECKER
+
+You frequently examine whether the full scope of the CLO is actually represented in assessment.
+""")
+
+    elif attainment_count >= 2:
+
+        st.info("""
+### 🔎 THE EVIDENCE HUNTER
+
+Your strongest reviewing instinct is:
+
+**“What evidence actually proves that students attained this outcome?”**
+""")
+
+    elif cognitive_count >= 2:
+
+        st.info("""
+### 🧠 THE COGNITIVE ALIGNMENT CHECKER
+
+You pay particular attention to whether assessment tasks genuinely operate at the cognitive level demanded by the CLO.
+""")
+
+    else:
+
+        st.info("""
+### ⚖️ THE BALANCED REVIEWER
+
+You considered several dimensions of OBE alignment rather than relying on a single indicator.
+""")
+
+    # -----------------------------------------------------
+    # CONFIDENCE
+    # -----------------------------------------------------
+
+    avg_confidence = sum(
+        st.session_state.confidence
+    ) / len(st.session_state.confidence)
+
+    st.metric(
+        "Average Review Confidence",
+        f"{avg_confidence:.1f} / 5"
+    )
+
+    # -----------------------------------------------------
+    # FINAL MESSAGE
+    # -----------------------------------------------------
+
+    st.markdown("---")
+
+    st.markdown("""
+# 🔐 THE OBE CODE
+
+OBE alignment is **not simply:**
+
+### Evaluate = Evaluate
+
+A defensible OBE lesson asks whether the following chain is coherent:
+
+## 🎯 CLO
+### ↓
+## 👩‍🏫 Learning Experience
+### ↓
+## 📝 Assessment
+### ↓
+## 📋 Rubric
+### ↓
+## 📊 Evidence of Attainment
+""")
+
+    st.success("""
+### If one link breaks, the reported CLO attainment may become difficult to defend.
+""")
+
+    st.markdown("---")
+
+    st.markdown("""
+## 🤖 And now comes the AI question...
+
+AI can generate a lesson plan in seconds.
+
+But can it ensure that:
+
+- the **CLO is measurable**,
+- the **learning activity prepares students for it**,
+- the **assessment generates the right evidence**,
+- and the **rubric actually measures attainment**?
+
+### That's the challenge of AI-assisted OBE lesson planning.
+""")
+
+    st.success(
+        "🚀 Let's test it with the OBE Lesson Planner."
+    )
+
+    # -----------------------------------------------------
+    # RESTART
+    # -----------------------------------------------------
+
+    st.markdown("---")
+
+    if st.button(
+        "🔄 START A NEW BOARD REVIEW",
+        use_container_width=True
+    ):
+        st.session_state.clear()
+        st.rerun()
